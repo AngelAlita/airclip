@@ -132,7 +132,7 @@ def apply_lora(args, model):
                                     new_v = LinearLoRA(attn_submodule,r=args.r,lora_alpha=args.lora_alpha, lora_dropout=args.dropout_rate)
                                     setattr(submodule, attn_name, new_v)
                                     list_lora_layers.append(new_v)
-                                elif 'proj' in attn_name and 'proj' in args.params:
+                                elif 'out' in attn_name and 'out' in args.params:
                                     new_proj = LinearLoRA(attn_submodule,r=args.r,lora_alpha=args.lora_alpha, lora_dropout=args.dropout_rate)
                                     setattr(submodule,attn_name, new_proj)
                                     list_lora_layers.append(new_proj)
@@ -170,7 +170,7 @@ def apply_lora(args, model):
                                     new_v = LinearLoRA(attn_submodule,r=args.r,lora_alpha=args.lora_alpha, lora_dropout=args.dropout_rate)
                                     setattr(submodule, attn_name, new_v)
                                     list_lora_layers.append(new_v)
-                                elif 'proj' in attn_name and 'proj' in args.params:
+                                elif 'out' in attn_name and 'out' in args.params:
                                     new_proj = LinearLoRA(attn_submodule,r=args.r,lora_alpha=args.lora_alpha, lora_dropout=args.dropout_rate)
                                     setattr(submodule,attn_name, new_proj)
                                     list_lora_layers.append(new_proj)
@@ -193,23 +193,35 @@ def save_lora(args, list_lora_layers):
         layer_weights = {}
         if 'q' in args.params:
             layer_weights['q_proj'] = {
-                'w_lora_A': layer.q_proj.w_lora_A.data,
-                'w_lora_B': layer.q_proj.w_lora_B.data
+                'w_lora_A': layer.w_lora_A.data,
+                'w_lora_B': layer.w_lora_B.data
             }
         if 'k' in args.params:
             layer_weights['k_proj'] = {
-                'w_lora_A': layer.k_proj.w_lora_A.data,
-                'w_lora_B': layer.k_proj.w_lora_B.data
+                'w_lora_A': layer.w_lora_A.data,
+                'w_lora_B': layer.w_lora_B.data
             }
         if 'v' in args.params:
             layer_weights['v_proj'] = {
-                'w_lora_A': layer.v_proj.w_lora_A.data,
-                'w_lora_B': layer.v_proj.w_lora_B.data
+                'w_lora_A': layer.w_lora_A.data,
+                'w_lora_B': layer.w_lora_B.data
             }
-        if 'o' in args.params:
-            layer_weights['proj'] = {
-                'w_lora_A': layer.proj.w_lora_A.data,
-                'w_lora_B': layer.proj.w_lora_B.data
+        if 'out' in args.params:
+            layer_weights['out_proj'] = {
+                'w_lora_A': layer.w_lora_A.data,
+                'w_lora_B': layer.w_lora_B.data
+            }
+
+        if 'fc1' in args.params:
+            layer_weights['fc1'] = {
+                'w_lora_A': layer.w_lora_A.data,
+                'w_lora_B': layer.w_lora_B.data
+            }
+
+        if 'fc2' in args.params:
+            layer_weights['fc2'] = {
+                'w_lora_A': layer.w_lora_A.data,
+                'w_lora_B': layer.w_lora_B.data
             }
 
         weights[f'layer_{i}'] = layer_weights
@@ -229,7 +241,7 @@ def save_lora(args, list_lora_layers):
 
     # to manage names like ViT-B/16
     backbone = args.backbone.replace('/', '').replace('-', '').lower()
-    save_dir = f'{args.save_path}/{backbone}/{args.dataset}/{args.shots}shots/seed{args.seed}'
+    save_dir = f'{args.save_path}/{backbone}/seed{args.seed}'
     os.makedirs(save_dir, exist_ok=True)
 
     save_path = f'{save_dir}/{args.filename}.pt'
@@ -240,7 +252,7 @@ def save_lora(args, list_lora_layers):
 def load_lora(args, list_lora_layers):
     # to manage names like ViT-B/16
     backbone = args.backbone.replace('/', '').replace('-', '').lower()
-    load_path = f'{args.save_path}/{backbone}/{args.dataset}/{args.shots}shots/seed{args.seed}/{args.filename}.pt'
+    load_path = f'{args.save_path}/{backbone}/seed{args.seed}/{args.filename}.pt'
 
     if not os.path.exists(load_path):
         raise FileNotFoundError(f'File {load_path} does not exist.')
@@ -268,21 +280,21 @@ def load_lora(args, list_lora_layers):
     for i, layer in enumerate(list_lora_layers):
         layer_weights = weights[f'layer_{i}']
         if 'q' in args.params and 'q_proj' in layer_weights:
-            layer.q_proj.w_lora_A.data.copy_(
+            layer.w_lora_A.data.copy_(
                 layer_weights['q_proj']['w_lora_A'])
-            layer.q_proj.w_lora_B.data.copy_(
+            layer.w_lora_B.data.copy_(
                 layer_weights['q_proj']['w_lora_B'])
         if 'k' in args.params and 'k_proj' in layer_weights:
-            layer.k_proj.w_lora_A.data.copy_(
+            layer.w_lora_A.data.copy_(
                 layer_weights['k_proj']['w_lora_A'])
-            layer.k_proj.w_lora_B.data.copy_(
+            layer.w_lora_B.data.copy_(
                 layer_weights['k_proj']['w_lora_B'])
         if 'v' in args.params and 'v_proj' in layer_weights:
-            layer.v_proj.w_lora_A.data.copy_(
+            layer.w_lora_A.data.copy_(
                 layer_weights['v_proj']['w_lora_A'])
-            layer.v_proj.w_lora_B.data.copy_(
+            layer.w_lora_B.data.copy_(
                 layer_weights['v_proj']['w_lora_B'])
-        if 'o' in args.params and 'proj' in layer_weights:
+        if 'out' in args.params and 'out' in layer_weights:
             layer.proj.w_lora_A.data.copy_(layer_weights['proj']['w_lora_A'])
             layer.proj.w_lora_B.data.copy_(layer_weights['proj']['w_lora_B'])
 

@@ -90,12 +90,13 @@ def itm_eval(scores_i2t, scores_t2i, txt2img, img2txt):
 def run_lora(args,model,train_loader,val_loader,test_loader,ids):
     list_lora_layers = apply_lora(args,model)
     model.cuda()
-
+    print(model)
     if args.eval_only:
-        load_lora(args, list_lora_layers)
-        score_test_i2t, score_test_t2i = evaluation(model, test_loader, model.device)
-        test_result = itm_eval(score_test_i2t, score_test_t2i, test_loader.dataset.txt2img, test_loader.dataset.img2txt) 
-        print(test_result)
+        #waitting to fix
+        # load_lora(args, list_lora_layers)
+        # score_test_i2t, score_test_t2i = evaluation(model, test_loader, model.device)
+        # test_result = itm_eval(score_test_i2t, score_test_t2i, test_loader.dataset.txt2img, test_loader.dataset.img2txt) 
+        # print(test_result)
         return
 
     # make only parms to trian
@@ -148,6 +149,7 @@ def run_lora(args,model,train_loader,val_loader,test_loader,ids):
             test_result['epoch'] = epoch
             print(test_result)
 
-            if args.save_path != None:
-                save_lora(args,list_lora_layers)
-            return
+    if args.save_path != None:
+        #waitting to fixxx
+        #save_lora(args,list_lora_layers)
+        return
