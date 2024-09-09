@@ -122,6 +122,7 @@ def estimate(X, fraction=0.9, verbose=True):
     regr = linear_model.LinearRegression(fit_intercept=False)
     if npoints <= 3:
         print("exception, let's debug")
+        return x,y,0,0,0
         # q.d()
     regr.fit(
         x[0:npoints, np.newaxis], y[0:npoints, np.newaxis]
