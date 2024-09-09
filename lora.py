@@ -2,11 +2,12 @@ import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
+from computeID import computeID
 from utils import *
 
 from loralib.utils import mark_only_lora_as_trainable, apply_lora, get_lora_parameters, lora_state_dict, save_lora, load_lora
 from loralib import layers as lora_layers
-
+from loralib import LinearLoRA
 
 @torch.no_grad()
 def evaluation(model, data_loader, device):
@@ -110,6 +111,8 @@ def run_lora(args,model,train_loader,val_loader,test_loader,ids):
     best_r1_val,best_r1_test=0.,0.
     best_epoch_val = 0
 
+    # Guide the LoRA when to merge the parameters
+    idcator = ids[142]
     for epoch in range(1,args.epoch + 1):
             model.train()
             loss_epoch = 0.
@@ -149,6 +152,30 @@ def run_lora(args,model,train_loader,val_loader,test_loader,ids):
             test_result['epoch'] = epoch
             print(test_result)
 
+            if args.cola:
+                for n,m in model.named_modules():
+                    if type(m) == LinearLoRA:
+                        m.merge_BA()
+                        m.init_lora_param()
+                
+                model.cuda()
+                # reset optimizer
+                optimizer = torch.optim.AdamW(get_lora_parameters(model), weight_decay=args.weight_decay, lr=args.lr)
+
+            if args.idcola:
+                new_ids = computeID(args,model,train_loader,val_loader,test_loader,model.device)
+                new_idcator = new_ids[142]
+                if new_idcator < idcator:
+                    idcator = new_idcator
+                    for n,m in model.named_modules():
+                        if type(m) == LinearLoRA:
+                            m.merge_BA()
+                            m.init_lora_param()
+
+                    model.cuda()
+                    # reset optimizer
+                    optimizer = torch.optim.AdamW(get_lora_parameters(model), weight_decay=args.weight_decay, lr=args.lr)
+                    
     if args.save_path != None:
         #waitting to fixxx
         #save_lora(args,list_lora_layers)

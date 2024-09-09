@@ -31,7 +31,8 @@ def get_arguments():
     parser.add_argument('--r', default=32, type=int, help='the rank of the low-rank matrices')
     parser.add_argument('--lora_alpha', default=1, type=float, help='scaling (see LoRA paper)')
     parser.add_argument('--dropout_rate', default=0.25, type=float, help='dropout rate applied before the LoRA module')
-    
+    parser.add_argument('--cola', action='store_true', help="Chain of LoRA")
+    parser.add_argument('--idcola', action='store_true', help="Chain of LoRA using id to guide")
 
     # ID arguments
     parser.add_argument('-n', '--nsamples', type=int, default=2000,help='Number of samples selected')

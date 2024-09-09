@@ -31,7 +31,7 @@ from torchvision import datasets, models, transforms
 
 from transformers import CLIPProcessor, CLIPModel
 from data import create_dataset, create_sampler, create_loader
-
+from loralib import LinearLoRA
 
 # functions to select checkpoint layers and to determine their depths
 
@@ -161,7 +161,7 @@ def getDepths(model):
     names = []
     depths = []
     for name, p in model.named_modules():
-        if (type(p)==torch.nn.modules.linear.Linear)and('predictions.transform.dense' not in name)and('cls.predictions.decoder'not in name) and ('projection' not in name):
+        if (type(p)==torch.nn.modules.linear.Linear or type(p) == LinearLoRA)and('predictions.transform.dense' not in name)and('cls.predictions.decoder'not in name) and ('projection' not in name):
             count += 1
             modules.append(p)
             depths.append(count)
