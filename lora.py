@@ -169,7 +169,7 @@ def run_lora(args,model,train_loader,val_loader,test_loader,ids):
                     idcator = new_idcator
                     for n,m in model.named_modules():
                         if type(m) == LinearLoRA:
-                            m.merge_BA()
+                            m.merge_lora_param()
                             m.init_lora_param()
 
                     model.cuda()
