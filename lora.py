@@ -91,7 +91,7 @@ def itm_eval(scores_i2t, scores_t2i, txt2img, img2txt):
 def run_lora(args,model,train_loader,val_loader,test_loader,ids):
     list_lora_layers = apply_lora(args,model)
     model.cuda()
-    print(model)
+    
     if args.eval_only:
         #waitting to fix
         # load_lora(args, list_lora_layers)
