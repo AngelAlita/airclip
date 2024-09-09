@@ -1,0 +1,13 @@
+annotations/coco_karpathy_test.json
+annotations/coco_karpathy_train.json
+annotations/coco_karpathy_val.json
+model/clip-vit-base-patch32/config.json
+model/clip-vit-base-patch32/flax_model.msgpack
+model/clip-vit-base-patch32/merges.txt
+model/clip-vit-base-patch32/preprocessor_config.json
+model/clip-vit-base-patch32/pytorch_model.bin
+model/clip-vit-base-patch32/special_tokens_map.json
+model/clip-vit-base-patch32/tf_model.h5
+model/clip-vit-base-patch32/tokenizer_config.json
+model/clip-vit-base-patch32/tokenizer.json
+model/clip-vit-base-patch32/vocab.json
