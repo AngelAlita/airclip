@@ -164,10 +164,10 @@ def run_lora(args,model,train_loader,val_loader,test_loader,ids):
                 optimizer = torch.optim.AdamW(get_lora_parameters(model), weight_decay=args.weight_decay, lr=args.lr)
 
             if args.idcola:
-                print("#######What can i say? COLA WITH ID!!!!!!!!!######")
                 new_ids = computeID(args,model,train_loader,val_loader,test_loader,model.device)
                 new_idcator = new_ids[142]
                 if new_idcator < idcator:
+                    print("#######What can i say? COLA WITH ID!!!!!!!!!######")
                     idcator = new_idcator
                     for n,m in model.named_modules():
                         if type(m) == LinearLoRA:
@@ -177,7 +177,7 @@ def run_lora(args,model,train_loader,val_loader,test_loader,ids):
                     model.cuda()
                     # reset optimizer
                     optimizer = torch.optim.AdamW(get_lora_parameters(model), weight_decay=args.weight_decay, lr=args.lr)
-                    
+                
     if args.save_path != None:
         #waitting to fixxx
         #save_lora(args,list_lora_layers)

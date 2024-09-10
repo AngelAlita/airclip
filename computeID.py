@@ -231,11 +231,13 @@ def computeID(args,model,train_loader, val_loader, test_loader,device):
 
 
     rcdr = DataRecorder(dataloader_path, modules)
+    handles = []
     for l, module in enumerate(modules):
         f = open(os.path.join(results_folder, "ID.txt"), "a")
         f.write("module: {}".format(module) + "\n")
         f.close()
         handle = module.register_forward_hook(rcdr.hook)
+        handles.append(handle)
 
     if not args.s:
         print("extract")
@@ -251,7 +253,11 @@ def computeID(args,model,train_loader, val_loader, test_loader,device):
                 out = model(pixel_values=inputs1.to(device),input_ids = inputs2.to(device))
                 del out
         pbar.close()
-    torch.cuda.empty_cache()
+    
+    # remove hooks
+    for handle in handles:
+        handle.remove()
+    
 
     ids = []
     print("block_analysis")
